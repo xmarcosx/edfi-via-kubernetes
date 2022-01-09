@@ -51,6 +51,10 @@ kubectl delete deployment deployment-name;
 # get postgres pod name and exec psql command on it
 POD=`kubectl get pods -l app=postgres -o wide | grep -v NAME | awk '{print $1}'`
 kubectl exec -it $POD -- psql -U postgres
+\l
+\c EdFi_Ods_2022
+\dt *.*
+\q
 
 ```
 
