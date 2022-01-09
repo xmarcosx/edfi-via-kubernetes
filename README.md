@@ -48,6 +48,11 @@ kubectl logs container-name;
 kubectl attach pod-name -c container-name;
 kubectl delete deployment deployment-name;
 
+kubectl create secret generic <YOUR-DB-SECRET> \
+  --from-literal=username=<YOUR-DATABASE-USER> \
+  --from-literal=password=<YOUR-DATABASE-PASSWORD> \
+  --from-literal=database=<YOUR-DATABASE-NAME>;
+
 # get postgres pod name and exec psql command on it
 POD=`kubectl get pods -l app=postgres -o wide | grep -v NAME | awk '{print $1}'`
 kubectl exec -it $POD -- psql -U postgres
