@@ -1,0 +1,30 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edfi
+spec:
+  selector:
+    matchLabels:
+      app: edfi
+  template:
+    metadata:
+      labels:
+        app: edfi
+    spec:
+      containers:
+      - name: db-ods-2022
+        image: edfialliance/ods-api-db-ods:v2.1.0
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        env:
+          - name: POSTGRES_USER
+            value: "postgres"
+          - name: POSTGRES_PASSWORD
+            value: "Winter2022!"
+          - name: ODS_DB
+            value: "EdFi_Ods_2022"
+        ports:
+        - containerPort: 5432
