@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: edfi-ods-dbs
+  name: edfi-ods-2022-db
 spec:
   strategy:
     rollingUpdate:
@@ -12,35 +12,13 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: edfi-ods-dbs
+      app: edfi-ods-2022-db
   template:
     metadata:
       labels:
-        app: edfi-ods-dbs
+        app: edfi-ods-2022-db
     spec:
       containers:
-      - name: db-ods-2021
-        image: edfialliance/ods-api-db-ods:v2.1.0
-        resources:
-          limits:
-            memory: "1Gi"
-            cpu: "1"
-        env:
-          - name: POSTGRES_USER
-            value: "postgres"
-          - name: POSTGRES_PASSWORD
-            value: "Winter2022!"
-          - name: ODS_DB
-            value: "EdFi_Ods_2021"
-          - name: TPDM_ENABLED
-            value: "true"
-          - name: PGDATA
-            value: /var/lib/postgresql/data/pgdata2021
-        ports:
-          - containerPort: 5432
-        volumeMounts:
-          - mountPath: /var/lib/postgresql/data
-            name: postgredb
       - name: db-ods-2022
         image: edfialliance/ods-api-db-ods:v2.1.0
         resources:
