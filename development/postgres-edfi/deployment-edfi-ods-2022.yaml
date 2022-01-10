@@ -35,13 +35,26 @@ spec:
           - name: TPDM_ENABLED
             value: "true"
           - name: PGDATA
-            value: /var/lib/postgresql/data/pgdata2022
+            value: /var/lib/postgresql/data/pgdata
         ports:
           - containerPort: 5432
         volumeMounts:
           - mountPath: /var/lib/postgresql/data
             name: postgredb
+      - name: pgbouncer-db-ods-2022
+        image: edoburu/pgbouncer:1.9.0
+        env:
+          - name: DB_HOST
+            value: 
+          - name: DB_PASSWORD
+            value: "Winter2022!"
+          - name: DB_USER
+            value: "postgres"
+          - name: POOL_MODE
+            value: "session"
+        ports:
+            - containerPort: 5432
       volumes:
         - name: postgredb
           persistentVolumeClaim:
-            claimName: postgresql-pv
+            claimName: pv-db-edfi-ods-2022
