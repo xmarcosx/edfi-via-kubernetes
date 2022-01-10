@@ -19,6 +19,18 @@ parameters:
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
+  name: pv-db-edfi-admin-security
+spec:
+  storageClassName: regionalpd-storageclass
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
   name: pv-db-edfi-ods-2021
 spec:
   storageClassName: regionalpd-storageclass

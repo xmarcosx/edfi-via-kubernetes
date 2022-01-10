@@ -44,7 +44,7 @@ gcloud artifacts repositories create my-repository \
 kubectl apply -f deployment.yaml;
 kubectl get pods;
 kubectl get service;
-kubectl logs container-name;
+kubectl logs pod-name container-name;
 kubectl attach pod-name -c container-name;
 kubectl delete deployment deployment-name;
 
