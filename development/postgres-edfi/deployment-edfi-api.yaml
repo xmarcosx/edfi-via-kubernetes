@@ -1,0 +1,46 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edfi-api
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: edfi-api
+  template:
+    metadata:
+      labels:
+        app: edfi-api
+    spec:
+      containers:
+      - name: edfi-api
+        image: edfialliance/ods-api-web-api:v2.1.0
+        resources:
+          limits:
+            memory: "2Gi"
+            cpu: "2"
+        env:
+          - name: POSTGRES_USER
+            value: "postgres"
+          - name: POSTGRES_PASSWORD
+            value: "Winter2022!"
+          - name: POSTGRES_PORT
+            value: "5432"
+          - name: ODS_POSTGRES_HOST
+            value: "EdFi_{0}"
+          - name: ADMIN_POSTGRES_HOST
+            value: pgbouncer-admin-dbs
+          - name: ApiSettings__PathBase
+            value: pgbouncer-service
+          - name: ODS_WAIT_POSTGRES_HOSTS
+            value: "pgbouncer-service.default.svc.my-cluster.tld "
+          - name: API_MODE
+            value: "YearSpecific"
+        ports:
+          - containerPort: 5432
