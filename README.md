@@ -26,7 +26,7 @@ gcloud services enable sqladmin.googleapis.com;
 
 gcloud config set compute/region us-central1;
 
-# create service account with access to Cloud SQL
+# create service account with access to cloud sql
 gcloud iam service-accounts create cloud-sql-proxy;
 gcloud projects add-iam-policy-binding PROJECT_ID \
     --member="serviceAccount:cloud-sql-proxy@PROJECT_ID.iam.gserviceaccount.com" \
@@ -70,6 +70,7 @@ kubectl annotate serviceaccount \
 kubectl apply -f deployment-pgbouncer.yaml;
 kubectl apply -f service-pgbouncer.yaml;
 
+# deploy edfi api and create managed cert for SSL
 kubectl apply -f managed-cert.yaml
 kubectl apply -f deployment-edfi-api.yaml;
 kubectl apply -f service-edfi-api.yaml;
