@@ -48,7 +48,7 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 # create static external ip address
 gcloud compute addresses create edfi --global;
 
-# DEV TODO configure the dns records for your domains to point to external ip address
+# DEV TODO configure the dns records for your domain to point to external ip address
 
 # create gke autopilot cluster
 gcloud container clusters create-auto my-cluster;
