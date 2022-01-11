@@ -1,6 +1,6 @@
 # Ed-Fi Deployed via Kubernetes
 
-This repository looks at deploying Ed-Fi via Google Kubernetes Engine. Historically I have maintained [this repo](https://github.com/xmarcosx/edfi-google-cloud-deployment) that contains all code necessary to deploy Ed-Fi via Google Cloud Run and Cloud SQL. Utilizing Cloud Run is the recommend route for most people looking to implement Ed-Fi. Cloud Run requires less management overhead by abstracting and is a great fully managed serverless platform. If you're simply looking to deploy Ed-Fi in Google Cloud, go [there](https://github.com/xmarcosx/edfi-google-cloud-deployment).
+This repository looks at deploying Ed-Fi via Google Kubernetes Engine. Historically I have maintained [this repo](https://github.com/xmarcosx/edfi-google-cloud-deployment) that contains all code necessary to deploy Ed-Fi via Google Cloud Run and Cloud SQL. Utilizing Cloud Run is the recommend route for most people looking to implement Ed-Fi. Cloud Run requires less management overhead and is a great fully managed serverless platform. If you're simply looking to deploy Ed-Fi in Google Cloud, go [there](https://github.com/xmarcosx/edfi-google-cloud-deployment).
 
 This repo was started for a few reasons:
 * I wanted to place [pgbouncer](https://www.pgbouncer.org/), a connection pooler, between the API and ODS to reduce the number of connections to the Cloud SQL instance allowing for smaller (AKA less expensive) instances.
