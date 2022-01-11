@@ -12,8 +12,6 @@ In this design the Ed-Fi ODS databases are deployed to a PostgreSQL Cloud SQL in
 
 ![Ed-Fi](/assets/kube.png)
 
-## Google Kubernetes Engine
-
 ```bash
 
 gcloud init;
