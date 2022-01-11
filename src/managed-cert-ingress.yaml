@@ -8,8 +8,20 @@ metadata:
     networking.gke.io/managed-certificates: managed-cert
     kubernetes.io/ingress.class: "gce"
 spec:
-  defaultBackend:
-    service:
-      name: edfi-api
-      port:
-        number: 80
+  rules:
+  - http:
+      paths:
+      - path: /api/*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: edfi-api
+            port:
+              number: 80
+      - path: /adminapp/*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: edfi-admin-app
+            port:
+              number: 80

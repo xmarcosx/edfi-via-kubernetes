@@ -8,6 +8,7 @@ This is my place to jot down notes as I work through learning kubernetes so I ma
 | Dagster Cloud agent            | This is the worker agent that Dagster Cloud will execute jobs on.                                        |
 | Apache Superset                |                                         |
 
+![Ed-Fi](/assets/kube.png)
 
 ## Google Kubernetes Engine
 
@@ -35,8 +36,7 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 # create static external ip address
 gcloud compute addresses create edfi --global;
 
-
-# create GKE autopilot cluster
+# create gke autopilot cluster
 gcloud container clusters create-auto my-cluster;
 
 # get auth credentials so kubectl can interact with the cluster
@@ -76,7 +76,7 @@ kubectl apply -f deployment-edfi-api.yaml;
 kubectl apply -f service-edfi-api.yaml;
 kubectl apply -f managed-cert-ingress.yaml;
 
-# TODO Configure the DNS records for your domains to point to the IP address of the load balancer.
+# TODO Configure the dns records for your domains to point to the IP address of the load balancer.
 # Create A record pointing to external IP address.
 
 # check status of certificate
