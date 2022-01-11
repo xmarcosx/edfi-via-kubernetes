@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: edfi-admin-app
-        image: edfialliance/ods-admin-app:v2.1.0
+        image: us-central1-docker.pkg.dev/PROJECT_ID/my-repository/edfi-admin-app:latest
         resources:
           limits:
             memory: "2Gi"

@@ -1,12 +1,14 @@
-# K12 analytics data stack
+# Ed-Fi Deployed via Kubernetes
 
-This is my place to jot down notes as I work through learning kubernetes so I may deploy the components below.
+This repository looks at deploying Ed-Fi via Google Kubernetes Engine. Historically I have maintained [this repo](https://github.com/xmarcosx/edfi-google-cloud-deployment) that contains all code necessary to deploy Ed-Fi via Google Cloud Run and Cloud SQL. Utilizing Cloud Run is the recommend route for most people looking to implement Ed-Fi. Cloud Run requires less management overhead by abstracting and is a great fully managed serverless platform. If you're simply looking to deploy Ed-Fi in Google Cloud, go [there](https://github.com/xmarcosx/edfi-google-cloud-deployment).
 
-| Component                      | Notes                                   |
-| ------------------------------ | --------------------------------------- |
-| Ed-Fi API and Admin App        | The API will run in YearSpecific mode. Will connect to Cloud SQL instance for ODS. pgbouncer will sit between the API and ODS for connection management.   |
-| Dagster Cloud agent            | This is the worker agent that Dagster Cloud will execute jobs on.                                        |
-| Apache Superset                |                                         |
+This repo was started for a few reasons:
+* I wanted to place [pgbouncer](https://www.pgbouncer.org/), a connection pooler, between the API and ODS to reduce the number of connections to the Cloud SQL instance allowing for smaller (AKA less expensive) instances.
+* I wanted to deploy [Dagster](https://dagster.io/) and [Apache Superset](https://superset.apache.org/), and having all of that in one kubernetes cluster was interesting to me.
+* I wanted to learn kubernetes and needed a project.
+
+In this design the Ed-Fi ODS databases are deployed to a PostgreSQL Cloud SQL instance. Reading [this documentation from Google](https://cloud.google.com/architecture/deploying-highly-available-postgresql-with-gke#understanding_options_to_deploy_a_database_instance_in_gke), I felt that Cloud SQL was a better option than GKE due to the management overhead that running PostgreSQL in kubernetes would add.
+
 
 ![Ed-Fi](/assets/kube.png)
 
@@ -27,6 +29,16 @@ gcloud services enable sqladmin.googleapis.com;
 
 gcloud config set compute/region us-central1;
 
+# create artifact registry repository
+gcloud artifacts repositories create my-repository \
+    --project=PROJECT_ID \
+    --repository-format=docker \
+    --location=us-central1 \
+    --description="Docker repository";
+
+gcloud builds submit \
+    --tag us-central1-docker.pkg.dev/PROJECT_ID/my-repository/edfi-admin-app src/admin-app/.;
+
 # create service account with access to cloud sql
 gcloud iam service-accounts create cloud-sql-proxy;
 gcloud projects add-iam-policy-binding PROJECT_ID \
@@ -35,6 +47,8 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 
 # create static external ip address
 gcloud compute addresses create edfi --global;
+
+# DEV TODO configure the dns records for your domains to point to external ip address
 
 # create gke autopilot cluster
 gcloud container clusters create-auto my-cluster;
@@ -74,52 +88,14 @@ kubectl apply -f service-pgbouncer.yaml;
 kubectl apply -f managed-cert.yaml
 kubectl apply -f deployment-edfi-api.yaml;
 kubectl apply -f service-edfi-api.yaml;
-kubectl apply -f managed-cert-ingress.yaml;
 
-# TODO Configure the dns records for your domains to point to the IP address of the load balancer.
-# Create A record pointing to external IP address.
+kubectl apply -f deployment-edfi-admin-app.yaml;
+kubectl apply -f managed-cert-ingress.yaml;
 
 # check status of certificate
 kubectl describe managedcertificate managed-cert;
 
-kubectl apply -f deployment-edfi-admin-app.yaml;
-
 ```
-
-
-## Useful commands
-
-```bash
-
-kubectl apply -f deployment.yaml;
-kubectl get pods;
-kubectl get service;
-kubectl logs pod-name container-name;
-kubectl attach pod-name -c container-name;
-kubectl delete deployment deployment-name;
-
-kubectl create secret generic <YOUR-DB-SECRET> \
-  --from-literal=username=<YOUR-DATABASE-USER> \
-  --from-literal=password=<YOUR-DATABASE-PASSWORD> \
-  --from-literal=database=<YOUR-DATABASE-NAME>;
-
-# get postgres pod name and exec psql command on it
-POD=`kubectl get pods -l app=postgres -o wide | grep -v NAME | awk '{print $1}'`
-kubectl exec -it $POD -- psql -U postgres
-\l
-\c EdFi_Ods_2022
-\dt *.*
-\q
-
-# create artifact registry repository
-# gcloud artifacts repositories create my-repository \
-#     --project=PROJECT_ID \
-#     --repository-format=docker \
-#     --location=us-central1 \
-#     --description="Docker repository";
-
-```
-
 
 ## Resources
 
