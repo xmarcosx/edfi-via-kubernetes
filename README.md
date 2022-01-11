@@ -24,8 +24,13 @@ gcloud services enable sqladmin.googleapis.com;
 
 gcloud config set compute/region us-central1;
 
-gcloud container clusters create-auto my-cluster \
-  --workload-pool=PROJECT_ID.svc.id.goog;
+gcloud iam service-accounts create cloud-sql-proxy;
+
+gcloud projects add-iam-policy-binding PROJECT_ID \
+    --member="serviceAccount:cloud-sql-proxy@PROJECT_ID.iam.gserviceaccount.com" \
+    --role=roles/cloudsql.client;
+
+gcloud container clusters create-auto my-cluster;
 
 # get auth credentials so kubectl can interact with the cluster
 gcloud container clusters get-credentials my-cluster;
@@ -39,8 +44,9 @@ gcloud artifacts repositories create my-repository \
 
 kubectl create secret generic cloud-sql-creds \
   --from-literal=username=postgres \
-  --from-literal=password=XXXXXXXXX \
-  --from-literal=database=EdFi_Admin;
+  --from-literal=password=XXXXXXXXX;
+
+cd src;
 
 kubectl apply -f service-account.yaml;
 
@@ -52,6 +58,8 @@ gcloud iam service-accounts add-iam-policy-binding \
 kubectl annotate serviceaccount \
   cloud-sql-proxy \
   iam.gke.io/gcp-service-account=cloud-sql-proxy@PROJECT_ID.iam.gserviceaccount.com;
+
+kubectl apply -f deployment.yaml;
 
 ```
 

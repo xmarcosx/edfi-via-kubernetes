@@ -21,12 +21,12 @@ spec:
       serviceAccountName: cloud-sql-proxy
       containers:
       - name: pgbouncer
-        image: edoburu/pgbouncer:1.9.0
+        image: edoburu/pgbouncer:1.15.0
         env:
         - name: DB_HOST
           value: "127.0.0.1"
         - name: DB_PORT
-          value: "5432"
+          value: "5431"
         - name: DB_USER
           valueFrom:
             secretKeyRef:
@@ -38,16 +38,16 @@ spec:
               name: cloud-sql-creds
               key: password
         ports:
-          - containerPort: 6432
+          - containerPort: 5432
             protocol: TCP
         readinessProbe:
           tcpSocket:
-            port: 6432
+            port: 5432
           initialDelaySeconds: 5
           periodSeconds: 10
         livenessProbe:
           tcpSocket:
-            port: 6432
+            port: 5432
           initialDelaySeconds: 15
           periodSeconds: 20
         lifecycle:
@@ -60,15 +60,11 @@ spec:
             memory: "2Gi"
             cpu:    "1"
       - name: cloud-sql-proxy
-        image: gcr.io/cloudsql-docker/gce-proxy:1.17
+        image: gcr.io/cloudsql-docker/gce-proxy:1.28.0
         command:
           - "/cloud_sql_proxy"
-          - --dir=/cloudsql
           - "-ip_address_types=PRIVATE"
-          - "-instances=PROJECT_ID:us-central1:edfi-ods-51=tcp:5432"
-        ports:
-          - containerPort: 5432
-            protocol: TCP
+          - "-instances=PROJECT_ID:us-central1:edfi-ods-51=tcp:127.0.0.1:5431"
         securityContext:
           runAsNonRoot: true
         resources:
