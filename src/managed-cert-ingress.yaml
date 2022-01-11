@@ -11,22 +11,15 @@ spec:
   rules:
   - http:
       paths:
-      # - path: /
-      #   pathType: Prefix
-      #   backend:
-      #     service:
-      #       name: edfi-api
-      #       port:
-      #         number: 80
-      - path: /api/*
-        pathType: Prefix
+      - path: /*
+        pathType: ImplementationSpecific
         backend:
           service:
             name: edfi-api
             port:
               number: 80
-      - path: /adminapp/*
-        pathType: Prefix
+      - path: /adminapp
+        pathType: ImplementationSpecific
         backend:
           service:
             name: edfi-admin-app
