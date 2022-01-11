@@ -26,6 +26,8 @@ gcloud config set compute/region us-central1;
 
 gcloud iam service-accounts create cloud-sql-proxy;
 
+gcloud compute addresses create edfi --global;
+
 gcloud projects add-iam-policy-binding PROJECT_ID \
     --member="serviceAccount:cloud-sql-proxy@PROJECT_ID.iam.gserviceaccount.com" \
     --role=roles/cloudsql.client;
@@ -64,8 +66,18 @@ kubectl annotate serviceaccount \
 
 kubectl apply -f deployment-pgbouncer.yaml;
 kubectl apply -f service-pgbouncer.yaml;
+
+kubectl apply -f managed-cert.yaml
 kubectl apply -f deployment-edfi-api.yaml;
 kubectl apply -f service-edfi-api.yaml;
+kubectl apply -f managed-cert-ingress.yaml;
+
+# TODO Configure the DNS records for your domains to point to the IP address of the load balancer.
+# Create A record pointing to external IP address.
+
+# check status of certificate
+kubectl describe managedcertificate managed-cert;
+
 kubectl apply -f deployment-edfi-admin-app.yaml;
 
 ```

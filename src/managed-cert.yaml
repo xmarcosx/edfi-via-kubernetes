@@ -1,0 +1,9 @@
+
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: managed-cert
+spec:
+  domains:
+    - k12analyticsengineering.dev
+    - www.k12analyticsengineering.dev

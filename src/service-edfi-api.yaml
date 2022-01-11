@@ -4,7 +4,7 @@ kind: Service
 metadata:
   name: edfi-api
 spec: # defines the behavior of a service
-  type: LoadBalancer # determines how the Service is exposed
+  type: NodePort # determines how the Service is exposed
   selector: # route service traffic to pods with label keys and values matching this selector
     app: edfi-api
   ports:
