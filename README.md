@@ -14,6 +14,8 @@ This is my place to jot down notes as I work through learning kubernetes so I ma
 ```bash
 
 gcloud init;
+
+# only if kubectl not installed already
 gcloud components install kubectl;
 
 gcloud services enable artifactregistry.googleapis.com;
@@ -24,37 +26,37 @@ gcloud services enable sqladmin.googleapis.com;
 
 gcloud config set compute/region us-central1;
 
+# create service account with access to Cloud SQL
 gcloud iam service-accounts create cloud-sql-proxy;
-
-gcloud compute addresses create edfi --global;
-
 gcloud projects add-iam-policy-binding PROJECT_ID \
     --member="serviceAccount:cloud-sql-proxy@PROJECT_ID.iam.gserviceaccount.com" \
     --role=roles/cloudsql.client;
 
+# create static external ip address
+gcloud compute addresses create edfi --global;
+
+
+# create GKE autopilot cluster
 gcloud container clusters create-auto my-cluster;
 
 # get auth credentials so kubectl can interact with the cluster
 gcloud container clusters get-credentials my-cluster;
 
-# create artifact registry repository
-# gcloud artifacts repositories create my-repository \
-#     --project=PROJECT_ID \
-#     --repository-format=docker \
-#     --location=us-central1 \
-#     --description="Docker repository";
-
+# create secret storing cloud sql credentials
 kubectl create secret generic cloud-sql-creds \
   --from-literal=username=postgres \
   --from-literal=password=XXXXXXXXX;
 
+# create secret storing admin app encryption key
 kubectl create secret generic edfi-admin-app-creds \
   --from-literal=key=$(/usr/bin/openssl rand -base64 32);
 
 cd src;
 
+# create kubernetes service account
 kubectl apply -f service-account.yaml;
 
+# bind kubernetes service account to google service account
 gcloud iam service-accounts add-iam-policy-binding \
   --role="roles/iam.workloadIdentityUser" \
   --member="serviceAccount:PROJECT_ID.svc.id.goog[default/cloud-sql-proxy]" \
@@ -64,6 +66,7 @@ kubectl annotate serviceaccount \
   cloud-sql-proxy \
   iam.gke.io/gcp-service-account=cloud-sql-proxy@PROJECT_ID.iam.gserviceaccount.com;
 
+# deploy pgbouncer with cloud sql proxy sidecar
 kubectl apply -f deployment-pgbouncer.yaml;
 kubectl apply -f service-pgbouncer.yaml;
 
@@ -106,6 +109,13 @@ kubectl exec -it $POD -- psql -U postgres
 \c EdFi_Ods_2022
 \dt *.*
 \q
+
+# create artifact registry repository
+# gcloud artifacts repositories create my-repository \
+#     --project=PROJECT_ID \
+#     --repository-format=docker \
+#     --location=us-central1 \
+#     --description="Docker repository";
 
 ```
 
