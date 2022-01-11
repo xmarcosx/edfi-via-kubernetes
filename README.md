@@ -36,15 +36,18 @@ gcloud container clusters create-auto my-cluster;
 gcloud container clusters get-credentials my-cluster;
 
 # create artifact registry repository
-gcloud artifacts repositories create my-repository \
-    --project=PROJECT_ID \
-    --repository-format=docker \
-    --location=us-central1 \
-    --description="Docker repository";
+# gcloud artifacts repositories create my-repository \
+#     --project=PROJECT_ID \
+#     --repository-format=docker \
+#     --location=us-central1 \
+#     --description="Docker repository";
 
 kubectl create secret generic cloud-sql-creds \
   --from-literal=username=postgres \
   --from-literal=password=XXXXXXXXX;
+
+kubectl create secret generic edfi-admin-app-creds \
+  --from-literal=key=$(/usr/bin/openssl rand -base64 32);
 
 cd src;
 
@@ -59,11 +62,14 @@ kubectl annotate serviceaccount \
   cloud-sql-proxy \
   iam.gke.io/gcp-service-account=cloud-sql-proxy@PROJECT_ID.iam.gserviceaccount.com;
 
-kubectl apply -f deployment.yaml;
+kubectl apply -f deployment-pgbouncer.yaml;
+kubectl apply -f service-pgbouncer.yaml;
+kubectl apply -f deployment-edfi-api.yaml;
+kubectl apply -f service-edfi-api.yaml;
+kubectl apply -f deployment-edfi-admin-app.yaml;
 
 ```
 
-* Create service account (ie. cloud-sql-proxy) with the role Cloud SQL Client
 
 ## Useful commands
 

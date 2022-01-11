@@ -2,24 +2,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: edfi-api
+  name: edfi-admin-app
 spec:
   strategy:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 1
     type: RollingUpdate
+  replicas: 1
   selector:
     matchLabels:
-      app: edfi-api
+      app: edfi-admin-app
   template:
     metadata:
       labels:
-        app: edfi-api
+        app: edfi-admin-app
     spec:
       containers:
-      - name: edfi-api
-        image: edfialliance/ods-api-web-api:v2.1.0
+      - name: edfi-admin-app
+        image: edfialliance/ods-admin-app:v2.1.0
         resources:
           limits:
             memory: "2Gi"
@@ -41,11 +42,22 @@ spec:
             value: "EdFi_{0}"
           - name: ADMIN_POSTGRES_HOST
             value: pgbouncer-service.default.svc.cluster.local
-          - name: ApiSettings__PathBase
-            value: pgbouncer-service.default.svc.cluster.local
-          - name: ODS_WAIT_POSTGRES_HOSTS
-            value: "pgbouncer-service.default.svc.cluster.local "
           - name: API_MODE
             value: "YearSpecific"
+          - name: API_EXTERNAL_URL
+            value: ""
+          - name: ENCRYPTION_KEY
+            valueFrom:
+              secretKeyRef:
+                name: edfi-admin-app-creds
+                key: key
+          - name: ADMINAPP_VIRTUAL_NAME
+            value: "edfi-admin-app"
+          - name: API_INTERNAL_URL
+            value: ""
+          - name: ADMINAPP_HEALTHCHECK_TEST
+            value: "curl -f edfi-admin-app/health"
+          - name: ODS_WAIT_POSTGRES_HOSTS
+            value: "pgbouncer-service.default.svc.cluster.local "
         ports:
           - containerPort: 80
