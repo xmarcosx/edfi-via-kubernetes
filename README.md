@@ -20,22 +20,42 @@ gcloud services enable artifactregistry.googleapis.com;
 gcloud services enable cloudbuild.googleapis.com;
 gcloud services enable compute.googleapis.com;
 gcloud services enable container.googleapis.com;
+gcloud services enable sqladmin.googleapis.com;
 
 gcloud config set compute/region us-central1;
 
-gcloud container clusters create-auto my-cluster;
+gcloud container clusters create-auto my-cluster \
+  --workload-pool=PROJECT_ID.svc.id.goog;
 
 # get auth credentials so kubectl can interact with the cluster
 gcloud container clusters get-credentials my-cluster;
 
 # create artifact registry repository
 gcloud artifacts repositories create my-repository \
-    --project=learning-kubernetes-337701 \
+    --project=PROJECT_ID \
     --repository-format=docker \
     --location=us-central1 \
     --description="Docker repository";
 
+kubectl create secret generic cloud-sql-creds \
+  --from-literal=username=postgres \
+  --from-literal=password=XXXXXXXXX \
+  --from-literal=database=EdFi_Admin;
+
+kubectl apply -f service-account.yaml;
+
+gcloud iam service-accounts add-iam-policy-binding \
+  --role="roles/iam.workloadIdentityUser" \
+  --member="serviceAccount:PROJECT_ID.svc.id.goog[default/cloud-sql-proxy]" \
+  cloud-sql-proxy@PROJECT_ID.iam.gserviceaccount.com;
+
+kubectl annotate serviceaccount \
+  cloud-sql-proxy \
+  iam.gke.io/gcp-service-account=cloud-sql-proxy@PROJECT_ID.iam.gserviceaccount.com;
+
 ```
+
+* Create service account (ie. cloud-sql-proxy) with the role Cloud SQL Client
 
 ## Useful commands
 
