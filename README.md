@@ -4,8 +4,8 @@ This is my place to jot down notes as I work through learning kubernetes so I ma
 
 | Component                      | Notes                                   |
 | ------------------------------ | --------------------------------------- |
-| Ed-Fi API, ODS, and Admin App  | The API will run in YearSpecific mode   |
-| Dagster Cloud agent            |                                         |
+| Ed-Fi API and Admin App        | The API will run in YearSpecific mode. Will connect to Cloud SQL instance for ODS. pgbouncer will sit between the API and ODS for connection management.   |
+| Dagster Cloud agent            | This is the worker agent that Dagster Cloud will execute jobs on.                                        |
 | Apache Superset                |                                         |
 
 
