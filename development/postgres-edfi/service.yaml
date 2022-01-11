@@ -6,8 +6,19 @@ metadata:
 spec:
   ports:
   - port: 5432
-    protocol: TCP
-    targetPort: 5432
+    targetPort: 6432
+    name: edfi-ods-2022-db
   selector:
-    app: pgbouncer
-  type: ClusterIP
+    app: edfi-ods-2022-db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgbouncer-admin-dbs
+spec:
+  ports:
+  - port: 5432
+    targetPort: 6432
+    name: edfi-admin-security-db
+  selector:
+    app: edfi-admin-security-db

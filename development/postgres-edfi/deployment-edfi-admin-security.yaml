@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: edfi-ods-2022-db
+  name: edfi-admin-security-db
 spec:
   strategy:
     rollingUpdate:
@@ -12,15 +12,15 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: edfi-ods-2022-db
+      app: edfi-admin-security-db
   template:
     metadata:
       labels:
-        app: edfi-ods-2022-db
+        app: edfi-admin-security-db
     spec:
       containers:
-      - name: db-ods-2022
-        image: edfialliance/ods-api-db-ods:v2.1.0
+      - name: db-admin-security
+        image: edfialliance/ods-api-db-admin:v2.1.0
         resources:
           limits:
             memory: "1Gi"
@@ -30,10 +30,8 @@ spec:
             value: "postgres"
           - name: POSTGRES_PASSWORD
             value: "Winter2022!"
-          - name: ODS_DB
-            value: "EdFi_Ods_2022"
-          - name: TPDM_ENABLED
-            value: "true"
+          - name: API_MODE
+            value: "YearSpecific"
           - name: PGDATA
             value: /var/lib/postgresql/data/pgdata
         ports:
@@ -41,7 +39,7 @@ spec:
         volumeMounts:
           - mountPath: /var/lib/postgresql/data
             name: postgredb
-      - name: pgbouncer-db-ods-2022
+      - name: pgbouncer-db-admin-security
         image: edoburu/pgbouncer:1.9.0
         args:
           - "/usr/bin/pgbouncer"
@@ -49,7 +47,7 @@ spec:
           - "-q"
         env:
           - name: DB_HOST
-            value: db-ods-2022
+            value: db-admin-security
           - name: DB_PASSWORD
             value: "Winter2022!"
           - name: DB_USER
@@ -72,4 +70,4 @@ spec:
       volumes:
         - name: postgredb
           persistentVolumeClaim:
-            claimName: pv-db-edfi-ods-2022
+            claimName: pv-db-edfi-admin-security
