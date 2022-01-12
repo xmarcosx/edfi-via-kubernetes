@@ -130,6 +130,7 @@ kubectl apply -f service-edfi-api.yaml;
 # DEV TODO replace <GOOGLE_PROJECT_ID> in deployment-edfi-admin-app.yaml
 # DEV TODO replace <DOMAIN_NAME> in deployment-edfi-admin-app.yaml
 kubectl apply -f deployment-edfi-admin-app.yaml;
+kubectl apply -f service-admin-app.yaml;
 kubectl apply -f managed-cert-ingress.yaml;
 
 # check status of certificate
