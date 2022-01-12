@@ -28,13 +28,15 @@ gcloud services enable cloudbuild.googleapis.com;
 bash cloud_sql/download_db_backups.sh;
 
 # create cloud sql instance
-gcloud sql instances create \
---zone us-central1-c \
---database-version POSTGRES_11 \
---memory 7680MiB \
---cpu 2 \
---storage-auto-increase \
---backup-start-time 08:00 edfi-ods-db;
+gcloud beta sql instances create \
+  --zone us-central1-c \
+  --database-version POSTGRES_11 \
+  --memory 7680MiB \
+  --cpu 2 \
+  --storage-auto-increase \
+  --network=projects/$GOOGLE_CLOUD_PROJECT/global/networks/default \
+  --no-assign-ip \
+  --backup-start-time 08:00 edfi-ods-db;
 
 gcloud sql databases create 'EdFi_Admin' --instance=edfi-ods-db;
 gcloud sql databases create 'EdFi_Security' --instance=edfi-ods-db;
@@ -60,23 +62,22 @@ gcloud services enable artifactregistry.googleapis.com;
 gcloud services enable compute.googleapis.com;
 gcloud services enable container.googleapis.com;
 
-
 gcloud config set compute/region us-central1;
 
 # create artifact registry repository
 gcloud artifacts repositories create my-repository \
-    --project=PROJECT_ID \
+    --project=$GOOGLE_CLOUD_PROJECT \
     --repository-format=docker \
     --location=us-central1 \
     --description="Docker repository";
 
 gcloud builds submit \
-    --tag us-central1-docker.pkg.dev/PROJECT_ID/my-repository/edfi-admin-app src/admin-app/.;
+    --tag us-central1-docker.pkg.dev/$GOOGLE_CLOUD_PROJECT/my-repository/edfi-admin-app kubernetes/admin-app/.;
 
 # create service account with access to cloud sql
 gcloud iam service-accounts create cloud-sql-proxy;
-gcloud projects add-iam-policy-binding PROJECT_ID \
-    --member="serviceAccount:cloud-sql-proxy@PROJECT_ID.iam.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT \
+    --member="serviceAccount:cloud-sql-proxy@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com" \
     --role=roles/cloudsql.client;
 
 # create static external ip address
@@ -93,13 +94,13 @@ gcloud container clusters get-credentials my-cluster;
 # create secret storing cloud sql credentials
 kubectl create secret generic cloud-sql-creds \
   --from-literal=username=postgres \
-  --from-literal=password=XXXXXXXXX;
+  --from-literal=password=<POSTGRES_PASSWORD>;
 
 # create secret storing admin app encryption key
 kubectl create secret generic edfi-admin-app-creds \
   --from-literal=key=$(/usr/bin/openssl rand -base64 32);
 
-cd src;
+cd kubernetes;
 
 # create kubernetes service account
 kubectl apply -f service-account.yaml;
@@ -107,26 +108,32 @@ kubectl apply -f service-account.yaml;
 # bind kubernetes service account to google service account
 gcloud iam service-accounts add-iam-policy-binding \
   --role="roles/iam.workloadIdentityUser" \
-  --member="serviceAccount:PROJECT_ID.svc.id.goog[default/cloud-sql-proxy]" \
-  cloud-sql-proxy@PROJECT_ID.iam.gserviceaccount.com;
+  --member="serviceAccount:$GOOGLE_CLOUD_PROJECT.svc.id.goog[default/cloud-sql-proxy]" \
+  cloud-sql-proxy@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com;
 
 kubectl annotate serviceaccount \
   cloud-sql-proxy \
-  iam.gke.io/gcp-service-account=cloud-sql-proxy@PROJECT_ID.iam.gserviceaccount.com;
+  iam.gke.io/gcp-service-account=cloud-sql-proxy@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com;
 
 # deploy pgbouncer with cloud sql proxy sidecar
+# DEV TODO replace <INSTANCE_CONNECTION_NAME> in deployment-pgbouncer.yaml
 kubectl apply -f deployment-pgbouncer.yaml;
 kubectl apply -f service-pgbouncer.yaml;
 
-# deploy edfi api and create managed cert for SSL
-kubectl apply -f managed-cert.yaml
+# deploy edfi api and create managed cert for ssl
+# DEV TODO replace domain names in managed-cert.yaml;
+kubectl apply -f managed-cert.yaml;
+
 kubectl apply -f deployment-edfi-api.yaml;
 kubectl apply -f service-edfi-api.yaml;
 
+# DEV TODO replace <GOOGLE_PROJECT_ID> in deployment-edfi-admin-app.yaml
+# DEV TODO replace <DOMAIN_NAME> in deployment-edfi-admin-app.yaml
 kubectl apply -f deployment-edfi-admin-app.yaml;
 kubectl apply -f managed-cert-ingress.yaml;
 
 # check status of certificate
+# wait until certificate status says ""
 kubectl describe managedcertificate managed-cert;
 
 ```

@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: edfi-admin-app
-        image: us-central1-docker.pkg.dev/PROJECT_ID/my-repository/edfi-admin-app:latest
+        image: us-central1-docker.pkg.dev/<GOOGLE_PROJECT_ID>/my-repository/edfi-admin-app:latest
         resources:
           limits:
             memory: "2Gi"
@@ -45,7 +45,7 @@ spec:
           - name: API_MODE
             value: "YearSpecific"
           - name: API_EXTERNAL_URL
-            value: "k12analyticsengineering.dev"
+            value: "<DOMAIN_NAME>"
           - name: ENCRYPTION_KEY
             valueFrom:
               secretKeyRef:
@@ -54,7 +54,7 @@ spec:
           - name: ADMINAPP_VIRTUAL_NAME
             value: "edfi-admin-app"
           - name: API_INTERNAL_URL
-            value: "k12analyticsengineering.dev"
+            value: "<DOMAIN_NAME>"
           - name: ADMINAPP_HEALTHCHECK_TEST
             value: "curl -f edfi-admin-app/health"
           - name: ODS_WAIT_POSTGRES_HOSTS
