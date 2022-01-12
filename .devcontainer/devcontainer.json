@@ -37,6 +37,8 @@
 		"ms-python.vscode-pylance"
 	],
 
+	"runArgs": ["--env-file",".env"],
+
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 

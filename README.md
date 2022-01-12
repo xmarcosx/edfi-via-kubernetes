@@ -21,11 +21,28 @@ This repo is designed to be cloned to Google Cloud Shell and all commands can be
 ## Cloud SQL
 ```bash
 
+gcloud services enable artifactregistry.googleapis.com;
+gcloud services enable compute.googleapis.com;
+gcloud services enable container.googleapis.com;
 gcloud services enable sqladmin.googleapis.com;
 gcloud services enable cloudbuild.googleapis.com;
+gcloud services enable servicenetworking.googleapis.com;
 
 # download database backup files
 bash cloud_sql/download_db_backups.sh;
+
+gcloud compute addresses create google-managed-services-default \
+    --global \
+    --purpose=VPC_PEERING \
+    --prefix-length=16 \
+    --description="peering range" \
+    --network=default;
+
+gcloud services vpc-peerings connect \
+    --service=servicenetworking.googleapis.com \
+    --ranges=google-managed-services-default \
+    --network=default \
+    --project=$GOOGLE_CLOUD_PROJECT;
 
 # create cloud sql instance
 gcloud beta sql instances create \
@@ -44,7 +61,7 @@ gcloud sql databases create 'EdFi_Ods_2023' --instance=edfi-ods-db;
 gcloud sql databases create 'EdFi_Ods_2022' --instance=edfi-ods-db;
 gcloud sql databases create 'EdFi_Ods_2021' --instance=edfi-ods-db;
 
-# DEV TODO navigate to your cloud sql instance and set password for postgres user
+gcloud sql users set-password postgres --password <POSTGRES_PASSWORD> --instance=edfi-ods-db;
 
 # connect to cloud sql instance via cloud sql proxy
 # keep proxy running while executing the next command
@@ -57,10 +74,6 @@ bash cloud_sql/seed_databases.sh <POSTGRES_PASSWORD>;
 ## Google Kubernetes Engine
 
 ```bash
-
-gcloud services enable artifactregistry.googleapis.com;
-gcloud services enable compute.googleapis.com;
-gcloud services enable container.googleapis.com;
 
 gcloud config set compute/region us-central1;
 
