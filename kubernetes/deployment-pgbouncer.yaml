@@ -1,0 +1,73 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgbouncer
+  namespace: default
+  labels:
+    tier: pgbouncer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgbouncer
+  template:
+    metadata:
+      labels:
+        app: pgbouncer
+    spec:
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 60
+      serviceAccountName: cloud-sql-proxy
+      containers:
+      - name: pgbouncer
+        image: edoburu/pgbouncer:1.15.0
+        env:
+        - name: DB_HOST
+          value: "127.0.0.1"
+        - name: DB_PORT
+          value: "5431"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: cloud-sql-creds
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cloud-sql-creds
+              key: password
+        ports:
+          - containerPort: 5432
+            protocol: TCP
+        readinessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        lifecycle:
+          preStop:
+            exec:
+              # Allow existing queries clients to complete within 120 seconds
+              command: ["/bin/sh", "-c", "killall -INT pgbouncer && sleep 120"]
+        resources:
+          limits:
+            memory: "2Gi"
+            cpu:    "1"
+      - name: cloud-sql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.28.0
+        command:
+          - "/cloud_sql_proxy"
+          - "-ip_address_types=PRIVATE"
+          - "-instances=PROJECT_ID:us-central1:edfi-ods-51=tcp:127.0.0.1:5431"
+        securityContext:
+          runAsNonRoot: true
+        resources:
+          limits:
+            memory: "2Gi"
+            cpu:    "1"

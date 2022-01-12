@@ -4,7 +4,7 @@ This repository looks at deploying Ed-Fi via Google Kubernetes Engine. Historica
 
 This repo was started for a few reasons:
 * I wanted to place [pgbouncer](https://www.pgbouncer.org/), a connection pooler, between the API and ODS to reduce the number of connections to the Cloud SQL instance allowing for smaller (AKA less expensive) instances.
-* I wanted to deploy [Dagster](https://dagster.io/) and [Apache Superset](https://superset.apache.org/), and having all of that in one kubernetes cluster was interesting to me.
+* I plan to deploy [Dagster](https://dagster.io/) and [Apache Superset](https://superset.apache.org/) as well, and having all of that in one kubernetes cluster was interesting to me.
 * I wanted to learn kubernetes and needed a project.
 
 In this design the Ed-Fi ODS databases are deployed to a PostgreSQL Cloud SQL instance. Reading [this documentation from Google](https://cloud.google.com/architecture/deploying-highly-available-postgresql-with-gke#understanding_options_to_deploy_a_database_instance_in_gke), I felt that Cloud SQL was a better option than GKE due to the management overhead that running PostgreSQL in kubernetes would add.
@@ -12,18 +12,52 @@ In this design the Ed-Fi ODS databases are deployed to a PostgreSQL Cloud SQL in
 
 ![Ed-Fi](/assets/kube.png)
 
+| Ed-Fi Component     | Version         |
+|---------------------|-----------------|
+| Ed-Fi API & ODS     | v5.3            |
+| Ed-Fi Admin App     | v2.3.2          |
+
+This repo is designed to be cloned to Google Cloud Shell and all commands can be run from there.
+## Cloud SQL
 ```bash
 
-gcloud init;
+gcloud services enable sqladmin.googleapis.com;
+gcloud services enable cloudbuild.googleapis.com;
 
-# only if kubectl not installed already
-gcloud components install kubectl;
+# download database backup files
+bash cloud_sql/download_db_backups.sh;
+
+# create cloud sql instance
+gcloud sql instances create \
+--zone us-central1-c \
+--database-version POSTGRES_11 \
+--memory 7680MiB \
+--cpu 2 \
+--storage-auto-increase \
+--backup-start-time 08:00 edfi-ods-db;
+
+gcloud sql databases create 'EdFi_Admin' --instance=edfi-ods-db;
+gcloud sql databases create 'EdFi_Security' --instance=edfi-ods-db;
+gcloud sql databases create 'EdFi_Ods_2023' --instance=edfi-ods-db;
+gcloud sql databases create 'EdFi_Ods_2022' --instance=edfi-ods-db;
+gcloud sql databases create 'EdFi_Ods_2021' --instance=edfi-ods-db;
+
+# connect to cloud sql instance via cloud sql proxy
+# keep proxy running while executing the next command
+cloud_sql_proxy -instances=<INSTANCE_CONNECTION_NAME>=tcp:5432;
+
+bash cloud_sql/seed_databases.sh <POSTGRES_PASSWORD>;
+
+```
+
+## Google Kubernetes Engine
+
+```bash
 
 gcloud services enable artifactregistry.googleapis.com;
-gcloud services enable cloudbuild.googleapis.com;
 gcloud services enable compute.googleapis.com;
 gcloud services enable container.googleapis.com;
-gcloud services enable sqladmin.googleapis.com;
+
 
 gcloud config set compute/region us-central1;
 
