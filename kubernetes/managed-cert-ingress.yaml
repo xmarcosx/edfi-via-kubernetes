@@ -19,7 +19,7 @@ spec:
             port:
               number: 80
       - path: /adminapp
-        pathType: ImplementationSpecific
+        pathType: Prefix
         backend:
           service:
             name: edfi-admin-app

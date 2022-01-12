@@ -24,6 +24,16 @@ spec:
           limits:
             memory: "2Gi"
             cpu: "2"
+        readinessProbe:
+          tcpSocket:
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 20
         env:
           - name: POSTGRES_USER
             valueFrom:

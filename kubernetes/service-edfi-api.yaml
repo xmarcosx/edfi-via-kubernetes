@@ -9,4 +9,6 @@ spec: # defines the behavior of a service
     app: edfi-api
   ports:
   - port: 80 # port that will be exposed by this service
-    targetPort: 80 # port to access on the pods targeted by the servic
+    targetPort: 80 # port to access on the pods targeted by the service
+    protocol: TCP
+    name: http

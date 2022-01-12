@@ -25,6 +25,20 @@ spec:
           limits:
             memory: "2Gi"
             cpu: "2"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 20
         env:
           - name: POSTGRES_USER
             valueFrom:

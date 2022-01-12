@@ -10,3 +10,5 @@ spec: # defines the behavior of a service
   ports:
   - port: 80 # port that will be exposed by this service
     targetPort: 80 # port to access on the pods targeted by the servic
+    protocol: TCP
+    name: http
