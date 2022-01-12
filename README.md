@@ -52,7 +52,6 @@ gcloud beta sql instances create \
   --cpu 2 \
   --storage-auto-increase \
   --network=projects/$GOOGLE_CLOUD_PROJECT/global/networks/default \
-  --no-assign-ip \
   --backup-start-time 08:00 edfi-ods-db;
 
 gcloud sql databases create 'EdFi_Admin' --instance=edfi-ods-db;
@@ -67,7 +66,7 @@ gcloud sql users set-password postgres --password <POSTGRES_PASSWORD> --instance
 # keep proxy running while executing the next command
 cloud_sql_proxy -instances=<INSTANCE_CONNECTION_NAME>=tcp:5432;
 
-bash cloud_sql/seed_databases.sh <POSTGRES_PASSWORD>;
+bash +x cloud_sql/seed_databases.sh <POSTGRES_PASSWORD>;
 
 ```
 
