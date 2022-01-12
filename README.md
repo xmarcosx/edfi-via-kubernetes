@@ -42,6 +42,8 @@ gcloud sql databases create 'EdFi_Ods_2023' --instance=edfi-ods-db;
 gcloud sql databases create 'EdFi_Ods_2022' --instance=edfi-ods-db;
 gcloud sql databases create 'EdFi_Ods_2021' --instance=edfi-ods-db;
 
+# DEV TODO navigate to your cloud sql instance and set password for postgres user
+
 # connect to cloud sql instance via cloud sql proxy
 # keep proxy running while executing the next command
 cloud_sql_proxy -instances=<INSTANCE_CONNECTION_NAME>=tcp:5432;
