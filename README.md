@@ -146,7 +146,7 @@ kubectl apply -f service-admin-app.yaml;
 kubectl apply -f managed-cert-ingress.yaml;
 
 # check status of certificate
-# wait until certificate status says ""
+# wait until certificate status says "Active"
 kubectl describe managedcertificate managed-cert;
 
 ```
