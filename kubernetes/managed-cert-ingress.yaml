@@ -9,7 +9,8 @@ metadata:
     kubernetes.io/ingress.class: "gce"
 spec:
   rules:
-  - http:
+  - host: k12analyticsengineering.dev
+    http:
       paths:
       - path: /*
         pathType: ImplementationSpecific
@@ -18,8 +19,11 @@ spec:
             name: edfi-api
             port:
               number: 80
-      - path: /adminapp
-        pathType: Prefix
+  - host: admin.k12analyticsengineering.dev
+    http:
+      paths:
+      - path: /*
+        pathType: ImplementationSpecific
         backend:
           service:
             name: edfi-admin-app
