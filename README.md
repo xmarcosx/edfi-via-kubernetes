@@ -146,6 +146,8 @@ kubectl apply -f service-edfi-api.yaml;
 # DEV TODO replace <DOMAIN_NAME> in deployment-edfi-admin-app.yaml
 kubectl apply -f deployment-edfi-admin-app.yaml;
 kubectl apply -f service-admin-app.yaml;
+
+# DEV TODO replace <DOMAIN_NAME> in managed-cert-ingress.yaml
 kubectl apply -f managed-cert-ingress.yaml;
 
 # check status of certificate

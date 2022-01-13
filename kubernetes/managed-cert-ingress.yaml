@@ -9,7 +9,7 @@ metadata:
     kubernetes.io/ingress.class: "gce"
 spec:
   rules:
-  - host: k12analyticsengineering.dev
+  - host: <DOMAIN_NAME>
     http:
       paths:
       - path: /*
@@ -19,7 +19,7 @@ spec:
             name: edfi-api
             port:
               number: 80
-  - host: admin.k12analyticsengineering.dev
+  - host: admin.<DOMAIN_NAME>
     http:
       paths:
       - path: /*
