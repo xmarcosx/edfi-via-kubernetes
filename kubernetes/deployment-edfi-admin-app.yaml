@@ -53,13 +53,13 @@ spec:
           - name: POSTGRES_PORT
             value: "5432"
           - name: ODS_POSTGRES_HOST
-            value: "EdFi_{0}"
+            value: pgbouncer-service.default.svc.cluster.local
           - name: ADMIN_POSTGRES_HOST
             value: pgbouncer-service.default.svc.cluster.local
           - name: API_MODE
             value: "YearSpecific"
           - name: API_EXTERNAL_URL
-            value: "<DOMAIN_NAME>"
+            value: "https://<DOMAIN_NAME>"
           - name: ENCRYPTION_KEY
             valueFrom:
               secretKeyRef:
@@ -68,7 +68,7 @@ spec:
           - name: ADMINAPP_VIRTUAL_NAME
             value: "edfi-admin-app"
           - name: API_INTERNAL_URL
-            value: "<DOMAIN_NAME>"
+            value: "https://<DOMAIN_NAME>"
           - name: ADMINAPP_HEALTHCHECK_TEST
             value: "curl -f edfi-admin-app/health"
           - name: ODS_WAIT_POSTGRES_HOSTS

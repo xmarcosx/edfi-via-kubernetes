@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: pgbouncer-service # <YOUR-SERVICE-NAME>.default.svc.cluster.local in application
+  name: pgbouncer-service # pgbouncer-service.default.svc.cluster.local in application
 spec:
   type: NodePort
   ports:

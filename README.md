@@ -84,7 +84,7 @@ gcloud artifacts repositories create my-repository \
     --description="Docker repository";
 
 gcloud builds submit \
-    --tag us-central1-docker.pkg.dev/$GOOGLE_CLOUD_PROJECT/my-repository/edfi-admin-app kubernetes/admin-app/.;
+    --tag us-central1-docker.pkg.dev/$GOOGLE_CLOUD_PROJECT/my-repository/edfi-admin-app kubernetes/admin_app/.;
 
 # create service account with access to cloud sql
 gcloud iam service-accounts create cloud-sql-proxy;
@@ -96,6 +96,9 @@ gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT \
 gcloud compute addresses create edfi --global;
 
 # DEV TODO configure the dns records for your domain to point to external ip address
+# @ A record to external ip
+# www A record to external ip
+# admin A record to external ip
 
 # create gke autopilot cluster
 gcloud container clusters create-auto my-cluster;
